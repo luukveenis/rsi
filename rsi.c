@@ -11,6 +11,8 @@
 #include <limits.h>
 #include <readline/readline.h>
 
+/* Personal includes */
+#include "processing.h"
 
 char* build_prompt(){
   char buf[_POSIX_PATH_MAX];
