@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pwd.h>
+#include <unistd.h>
 #include "processing.h"
 
 const char *COMMAND_SEPERATOR = " ";
@@ -37,13 +39,33 @@ int tokenize(char *input, cmd_ptr cmd_ref){
   return 0;
 }
 
+/* This could possibly use error checking see below:
+ * http://www.linuxquestions.org/questions/programming-9/chdir-~-to-$home-in-c-programming-language-4175457202/
+ */
+char* get_home_dir(){
+  uid_t uid = getuid();
+  struct passwd *pwd = getpwuid(uid);
+  return pwd->pw_dir;
+}
+
+void change_directory(cmd_ptr cmd_ref){
+  if (cmd_ref->argc > 2){
+    printf("Invalid command!\n");
+  } else if (cmd_ref->argc == 1 || strcmp(cmd_ref->argv[1], "~") == 0){
+    chdir(get_home_dir());
+  } else {
+    chdir(cmd_ref->argv[1]);
+  }
+}
+
 void process(char *input){
-  int i;
   cmd_ptr cmd_ref = initialize_cmd();
   tokenize(input, cmd_ref);
 
-  for (i=0; i < cmd_ref->argc; i++) {
-    printf("Argument %d: %s\n", i+1, cmd_ref->argv[i]);
+  if (strcmp("cd", cmd_ref->argv[0]) == 0){
+    change_directory(cmd_ref);
+  } else {
+    /* handle arbitrary commands */
   }
 
   free_cmd(cmd_ref);
