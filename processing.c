@@ -21,10 +21,12 @@ void free_cmd(cmd_ptr cmd_ref){
 }
 
 /* Tokenizes the user input and stores it in a struct cmd_ref
- * This is so that we can return both the parsed input
- * array, and also its length which is unknown at compile time */
+ * which stores both the number and the list of arguments
+ *
+ * The actual list size is size+1 to leave room for a terminating
+ * NULL pointer as required by execvp */
 int tokenize(char *input, cmd_ptr cmd_ref){
-  int size = 0;
+  int size = 1;
   char *token = NULL;
 
   for (token = strtok(input, COMMAND_SEPERATOR);
@@ -32,9 +34,10 @@ int tokenize(char *input, cmd_ptr cmd_ref){
        token = strtok(NULL, COMMAND_SEPERATOR))
   {
     cmd_ref->argv = realloc(cmd_ref->argv, ++size * sizeof(char*));
-    cmd_ref->argv[size-1] = token;
+    cmd_ref->argv[size-2] = token;
   }
-  cmd_ref->argc = size;
+  cmd_ref->argv[size-1] = NULL;
+  cmd_ref->argc = size-1;
 
   return 0;
 }
