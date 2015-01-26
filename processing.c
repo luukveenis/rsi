@@ -3,6 +3,7 @@
 #include <string.h>
 #include <pwd.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "processing.h"
 
 const char *COMMAND_SEPERATOR = " ";
@@ -61,6 +62,23 @@ void change_directory(cmd_ptr cmd_ref){
   }
 }
 
+void execute(cmd_ptr cmd_ref){
+  int status, retval;
+  pid_t cpid;
+
+  cpid = fork();
+  if (cpid >= 0){
+    if (cpid == 0){
+      retval = execvp(cmd_ref->argv[0], cmd_ref->argv);
+      exit(retval);
+    } else {
+      waitpid(cpid, &status, 0);
+    }
+  } else {
+    printf("Error: fork failed.\n");
+  }
+}
+
 void process(char *input){
   cmd_ptr cmd_ref = initialize_cmd();
   tokenize(input, cmd_ref);
@@ -68,7 +86,7 @@ void process(char *input){
   if (strcmp("cd", cmd_ref->argv[0]) == 0){
     change_directory(cmd_ref);
   } else {
-    /* handle arbitrary commands */
+    execute(cmd_ref);
   }
 
   free_cmd(cmd_ref);
