@@ -40,9 +40,12 @@ void run(){
       free(prompt);
       free(input);
       printf("\nbye bye\n");
-      exit(0);
+      exit(EXIT_SUCCESS);
     } else {
-      process(input);
+      /* Ignore empty inputs (pressing enter) */
+      if (strcmp(input, "")) {
+        process(input);
+      }
     }
   }
 }
