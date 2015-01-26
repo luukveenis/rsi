@@ -19,7 +19,7 @@ char* build_prompt(){
   char *prefix = "RSI: ";
   char *suffix = " > ";
   char *cwd = getcwd(buf, _POSIX_PATH_MAX);
-  char *prompt = (char*) malloc(strlen(prefix) + strlen(suffix) + strlen(cwd) + 1);
+  char *prompt = malloc(strlen(prefix) + strlen(suffix) + strlen(cwd) + 1);
 
   strcpy(prompt, prefix);
   strcat(prompt, cwd);
