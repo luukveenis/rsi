@@ -12,6 +12,7 @@ cmd_ptr initialize_cmd(){
   cmd_ptr cmd_ref = (cmd_ptr) malloc(sizeof(cmd));
   cmd_ref->argc = 0;
   cmd_ref->argv = NULL;
+  cmd_ref->background = 0;
 
   return cmd_ref;
 }
@@ -39,6 +40,13 @@ int tokenize(char *input, cmd_ptr cmd_ref){
   }
   cmd_ref->argv[size-1] = NULL;
   cmd_ref->argc = size-1;
+
+  if (!strcmp(cmd_ref->argv[size-2], "&")){
+    cmd_ref->background = 1;
+    cmd_ref->argv[size-2] = NULL;
+    cmd_ref->argc--;
+  }
+
 
   return 0;
 }
@@ -70,9 +78,17 @@ void execute(cmd_ptr cmd_ref){
   if (cpid >= 0){
     if (cpid == 0){
       retval = execvp(cmd_ref->argv[0], cmd_ref->argv);
+      if (retval == -1) {
+        fprintf(stderr, "RSI: ");
+        perror(cmd_ref->argv[0]);
+      }
       exit(retval);
     } else {
-      waitpid(cpid, &status, 0);
+      if (cmd_ref->background){
+        waitpid(cpid, &status, WNOHANG);
+      } else {
+        waitpid(cpid, &status, 0);
+      }
     }
   } else {
     printf("Error: fork failed.\n");

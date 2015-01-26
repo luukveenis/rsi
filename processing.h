@@ -5,6 +5,7 @@ typedef struct command *cmd_ptr;
 typedef struct command {
   int argc;
   char **argv;
+  int background;
 } cmd;
 
 int tokenize(char*, struct command*);
