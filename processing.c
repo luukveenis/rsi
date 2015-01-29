@@ -7,8 +7,6 @@
 #include <sys/types.h>
 #include "processing.h"
 
-const char *COMMAND_SEPERATOR = " ";
-
 cmd_ptr initialize_cmd(){
   cmd_ptr cmd_ref = (cmd_ptr) malloc(sizeof(cmd));
   cmd_ref->argc = 0;
@@ -32,9 +30,9 @@ int tokenize(char *input, cmd_ptr cmd_ref){
   int size = 1;
   char *token = NULL;
 
-  for (token = strtok(input, COMMAND_SEPERATOR);
+  for (token = strtok(input, " ");
        token;
-       token = strtok(NULL, COMMAND_SEPERATOR))
+       token = strtok(NULL, " "))
   {
     cmd_ref->argv = realloc(cmd_ref->argv, ++size * sizeof(char*));
     cmd_ref->argv[size-2] = token;
@@ -64,7 +62,7 @@ char* get_home_dir(){
 void change_directory(cmd_ptr cmd_ref){
   if (cmd_ref->argc > 2){
     printf("Invalid command!\n");
-  } else if (cmd_ref->argc == 1 || strcmp(cmd_ref->argv[1], "~") == 0){
+  } else if (cmd_ref->argc == 1 || !strcmp(cmd_ref->argv[1], "~")){
     chdir(get_home_dir());
   } else {
     chdir(cmd_ref->argv[1]);
@@ -100,7 +98,7 @@ void process(char *input){
   cmd_ptr cmd_ref = initialize_cmd();
   tokenize(input, cmd_ref);
 
-  if (strcmp("cd", cmd_ref->argv[0]) == 0){
+  if (!strcmp("cd", cmd_ref->argv[0])){
     change_directory(cmd_ref);
   } else {
     execute(cmd_ref);
