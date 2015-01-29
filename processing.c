@@ -4,6 +4,7 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include "processing.h"
 
 const char *COMMAND_SEPERATOR = " ";

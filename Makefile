@@ -5,7 +5,7 @@ LINKS = -lreadline
 all: rsi
 
 rsi: rsi.o processing.o
-	$(CC) $(LINKS) rsi.o processing.o -o rsi
+	$(CC) rsi.o processing.o $(LINKS) -o rsi
 
 rsi.o: rsi.c
 	$(CC) $(CFLAGS) rsi.c
