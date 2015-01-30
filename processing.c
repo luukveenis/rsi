@@ -1,3 +1,4 @@
+/* Standard library includes */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,9 +6,12 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+
+/* Project includes */
 #include "processing.h"
 #include "process_list.h"
 
+/* Initialize the struct that stores the parsed user input */
 cmd_ptr initialize_cmd(){
   cmd_ptr cmd_ref = (cmd_ptr) malloc(sizeof(cmd));
   cmd_ref->argc = 0;
@@ -17,6 +21,7 @@ cmd_ptr initialize_cmd(){
   return cmd_ref;
 }
 
+/* Deallocate memory used by command struct */
 void free_cmd(cmd_ptr cmd_ref){
   free(cmd_ref->argv);
   free(cmd_ref);
@@ -51,15 +56,15 @@ int tokenize(char *input, cmd_ptr cmd_ref){
   return 0;
 }
 
-/* This could possibly use error checking see below:
- * http://www.linuxquestions.org/questions/programming-9/chdir-~-to-$home-in-c-programming-language-4175457202/
- */
+/* More robust way to get home directory than environment variable */
 char* get_home_dir(){
   uid_t uid = getuid();
   struct passwd *pwd = getpwuid(uid);
   return pwd->pw_dir;
 }
 
+/* Change the current working directory
+ * Both "cd" and "cd ~" take the user to the home directory */
 void change_directory(cmd_ptr cmd_ref){
   if (cmd_ref->argc > 2){
     printf("Invalid command!\n");
@@ -70,6 +75,9 @@ void change_directory(cmd_ptr cmd_ref){
   }
 }
 
+/* Execute the command input by the user.
+ * Runs the program in the background if the user
+ * specifies & as the last argumen */
 void execute(cmd_ptr cmd_ref, llist_ref procs){
   int status, retval;
   pid_t cpid;
@@ -92,10 +100,14 @@ void execute(cmd_ptr cmd_ref, llist_ref procs){
       }
     }
   } else {
-    printf("Error: fork failed.\n");
+    perror("fork");
   }
 }
 
+/* Process the user's input:
+ * - tokenize the input string
+ * - handle changing directories since this isn't a program we can call
+ * - otherwise call execute which runs the command through execvp */
 void process(char *input, llist_ref procs){
   cmd_ptr cmd_ref = initialize_cmd();
   tokenize(input, cmd_ref);
