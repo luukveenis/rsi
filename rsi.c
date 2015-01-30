@@ -30,11 +30,33 @@ char* build_prompt(){
   return prompt;
 }
 
+void report_statuses(llist_ref procs){
+  int status;
+  node_ptr current = NULL;
+
+  for(current = procs->head; current; current = current->next){
+    waitpid(current->pid, &status, WNOHANG);
+    if (WIFEXITED(status)){
+      printf("Process %d exited with status: %d\n", current->pid, WEXITSTATUS(status));
+      delete_node(procs, search(procs, current->pid));
+    } else if (WIFSIGNALED(status)){
+      printf("Process %d killed by signal: %d\n", current->pid, WTERMSIG(status));
+      delete_node(procs, search(procs, current->pid));
+    } else if (WIFSTOPPED(status)){
+      printf("Process %d stopped by signal: %d\n", current->pid, WSTOPSIG(status));
+    } else if (WIFCONTINUED(status)){
+      printf("Process %d continued\n", current->pid);
+    }
+  }
+}
+
 void run(){
   char *prompt, *input;
   llist procs = { NULL, NULL, 0 };
 
   for(;; free(input)){
+    report_statuses(&procs);
+
     prompt = build_prompt();
     input = readline(prompt);
     free(prompt);
