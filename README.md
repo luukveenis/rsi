@@ -12,3 +12,10 @@ To compile the project simply type:
 
 To run the RSI simply type:
 - ./rsi
+
+## Notes
+
+Readline is currently not installed on the lab machines, so this code will
+not compile on them. However, linux.csc.uvic.ca has readline installed, so
+please run it there. The assignment description suggests using readline,
+so I assume this is okay.
