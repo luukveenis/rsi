@@ -14,7 +14,7 @@
 #include "processing.h"
 #include "process_list.h"
 
-#define PATH_MAX 120
+#define PATH_MAX 120 /* Buffer size to store path */
 
 char* build_prompt(){
   char buf[PATH_MAX];
@@ -39,6 +39,7 @@ void run(){
     input = readline(prompt);
     free(prompt);
 
+    /* Input is NULL (EOF) allows ctrl+d to quit */
     if (!input){
       printf("\nbye bye\n");
       exit(EXIT_SUCCESS);

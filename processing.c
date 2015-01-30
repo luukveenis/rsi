@@ -84,6 +84,7 @@ void execute(cmd_ptr cmd_ref, llist_ref procs){
       }
       exit(retval);
     } else {
+      /* Store the child process id if running in the background */
       if (cmd_ref->background){
         insert_at_head(procs, cpid);
       } else {
