@@ -38,17 +38,19 @@ void report_statuses(llist_ref procs){
 
   for(current = procs->head; current; current = next){
     next = current->next;
-    waitpid(current->pid, &status, WNOHANG);
-    if (WIFEXITED(status)){
-      printf("Process %d exited with status: %d\n", current->pid, WEXITSTATUS(status));
-      delete_node(procs, search(procs, current->pid));
-    } else if (WIFSIGNALED(status)){
-      printf("Process %d killed by signal: %d\n", current->pid, WTERMSIG(status));
-      delete_node(procs, search(procs, current->pid));
-    } else if (WIFSTOPPED(status)){
-      printf("Process %d stopped by signal: %d\n", current->pid, WSTOPSIG(status));
-    } else if (WIFCONTINUED(status)){
-      printf("Process %d continued\n", current->pid);
+
+    if (waitpid(current->pid, &status, WNOHANG | WUNTRACED)){
+      if (WIFSIGNALED(status)){
+        printf("Process %d killed by signal: %d\n", current->pid, WTERMSIG(status));
+        delete_node(procs, search(procs, current->pid));
+      } else if (WIFSTOPPED(status)){
+        printf("Process %d stopped by signal: %d\n", current->pid, WSTOPSIG(status));
+      } else if (WIFCONTINUED(status)){
+        printf("Process %d continued\n", current->pid);
+      } else if (WIFEXITED(status)){
+        printf("Process %d exited with status: %d\n", current->pid, WEXITSTATUS(status));
+        delete_node(procs, search(procs, current->pid));
+      }
     }
   }
 }
