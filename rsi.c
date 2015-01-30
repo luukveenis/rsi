@@ -71,7 +71,7 @@ void run(){
 
     /* Input is NULL (EOF) allows ctrl+d to quit */
     if (!input){
-      printf("\nbye bye\n");
+      printf("\nBye!\n");
       exit(EXIT_SUCCESS);
     } else {
       /* Ignore empty inputs (pressing enter) */
