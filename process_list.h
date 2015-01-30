@@ -15,7 +15,7 @@ typedef struct LinkedList
   node_ptr head;
   node_ptr tail;
   int size;
-} LList;
+} llist;
 
 void delete_node(llist_ref, node_ptr);
 node_ptr search(llist_ref, int);

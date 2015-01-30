@@ -12,8 +12,9 @@
 
 /* Personal includes */
 #include "processing.h"
+#include "process_list.h"
 
-#define PATH_MAX 100
+#define PATH_MAX 120
 
 char* build_prompt(){
   char buf[PATH_MAX];
@@ -31,20 +32,20 @@ char* build_prompt(){
 
 void run(){
   char *prompt, *input;
+  llist procs = { NULL, NULL, 0 };
 
-  for(;;free(prompt),free(input)){
+  for(;; free(input)){
     prompt = build_prompt();
     input = readline(prompt);
+    free(prompt);
 
     if (!input){
-      free(prompt);
-      free(input);
       printf("\nbye bye\n");
       exit(EXIT_SUCCESS);
     } else {
       /* Ignore empty inputs (pressing enter) */
       if (strcmp(input, "")) {
-        process(input);
+        process(input, &procs);
       }
     }
   }

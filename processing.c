@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include "processing.h"
+#include "process_list.h"
 
 cmd_ptr initialize_cmd(){
   cmd_ptr cmd_ref = (cmd_ptr) malloc(sizeof(cmd));
@@ -69,7 +70,7 @@ void change_directory(cmd_ptr cmd_ref){
   }
 }
 
-void execute(cmd_ptr cmd_ref){
+void execute(cmd_ptr cmd_ref, llist_ref procs){
   int status, retval;
   pid_t cpid;
 
@@ -84,7 +85,7 @@ void execute(cmd_ptr cmd_ref){
       exit(retval);
     } else {
       if (cmd_ref->background){
-        waitpid(cpid, &status, WNOHANG);
+        insert_at_head(procs, cpid);
       } else {
         waitpid(cpid, &status, 0);
       }
@@ -94,14 +95,14 @@ void execute(cmd_ptr cmd_ref){
   }
 }
 
-void process(char *input){
+void process(char *input, llist_ref procs){
   cmd_ptr cmd_ref = initialize_cmd();
   tokenize(input, cmd_ref);
 
   if (!strcmp("cd", cmd_ref->argv[0])){
     change_directory(cmd_ref);
   } else {
-    execute(cmd_ref);
+    execute(cmd_ref, procs);
   }
 
   free_cmd(cmd_ref);
