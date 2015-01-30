@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <readline/readline.h>
 
 /* Personal includes */
@@ -33,8 +34,10 @@ char* build_prompt(){
 void report_statuses(llist_ref procs){
   int status;
   node_ptr current = NULL;
+  node_ptr next = NULL;
 
-  for(current = procs->head; current; current = current->next){
+  for(current = procs->head; current; current = next){
+    next = current->next;
     waitpid(current->pid, &status, WNOHANG);
     if (WIFEXITED(status)){
       printf("Process %d exited with status: %d\n", current->pid, WEXITSTATUS(status));
